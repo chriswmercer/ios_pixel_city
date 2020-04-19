@@ -1,0 +1,11 @@
+project 'Pixel City.xcodeproj'
+
+target 'PIxel City' do
+
+  use_frameworks!
+
+  #Pods for Pixel City
+  pod 'Alamofire'
+  pod 'AlamofireImage'
+
+end
