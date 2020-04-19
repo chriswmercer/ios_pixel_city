@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		508947171FA9C22A519F9693 /* Pods_PIxel_City.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 86E95BD7A45D64E44ACDCD79 /* Pods_PIxel_City.framework */; };
+		6E3E75FA244CA3950078C518 /* DroppablePinView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E3E75F9244CA3950078C518 /* DroppablePinView.swift */; };
 		6E494108244C703200CFAE10 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E494107244C703200CFAE10 /* AppDelegate.swift */; };
 		6E49410A244C703200CFAE10 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E494109244C703200CFAE10 /* SceneDelegate.swift */; };
 		6E49410C244C703200CFAE10 /* MapViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E49410B244C703200CFAE10 /* MapViewController.swift */; };
@@ -17,6 +18,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		6E3E75F9244CA3950078C518 /* DroppablePinView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DroppablePinView.swift; sourceTree = "<group>"; };
 		6E494104244C703200CFAE10 /* Pixel City.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Pixel City.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		6E494107244C703200CFAE10 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		6E494109244C703200CFAE10 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -103,6 +105,7 @@
 		6E49411D244C707300CFAE10 /* View */ = {
 			isa = PBXGroup;
 			children = (
+				6E3E75F9244CA3950078C518 /* DroppablePinView.swift */,
 			);
 			path = View;
 			sourceTree = "<group>";
@@ -237,6 +240,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				6E3E75FA244CA3950078C518 /* DroppablePinView.swift in Sources */,
 				6E49410C244C703200CFAE10 /* MapViewController.swift in Sources */,
 				6E494108244C703200CFAE10 /* AppDelegate.swift in Sources */,
 				6E49410A244C703200CFAE10 /* SceneDelegate.swift in Sources */,
