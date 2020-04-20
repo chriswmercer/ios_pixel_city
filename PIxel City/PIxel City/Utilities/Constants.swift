@@ -11,6 +11,7 @@ import Foundation
 //reuse IDs
 let REUSE_ID_PHOTOCELL = "photoCell"
 let REUSE_ID_PIN = "droppablePin"
+let STORYBOARD_ID_POPVC = "popvc"
 
 //fonts
 let FONT_AVENIR_NEXT = "Avenir Next"

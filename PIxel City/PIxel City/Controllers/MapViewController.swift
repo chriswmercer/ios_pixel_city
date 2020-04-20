@@ -43,7 +43,7 @@ class MapViewController: UIViewController, UIGestureRecognizerDelegate {
         collectionView?.register(PhotoViewCell.self, forCellWithReuseIdentifier: REUSE_ID_PHOTOCELL)
         collectionView?.delegate = self
         collectionView?.dataSource = self
-        collectionView?.backgroundColor = #colorLiteral(red: 0.721568644, green: 0.8862745166, blue: 0.5921568871, alpha: 1)
+        collectionView?.backgroundColor = #colorLiteral(red: 1, green: 1, blue: 1, alpha: 1)
         pullUpView.addSubview(collectionView!)
     }
     
@@ -146,6 +146,9 @@ extension MapViewController: MKMapViewDelegate {
         removeProgressLabel()
         addSpinner()
         addProgressLabel()
+        imageUrlArray = []
+        imageArray = []
+        collectionView?.reloadData()
                 
         let touchPoint = sender.location(in: mapView)
         let touchCoord = mapView.convert(touchPoint, toCoordinateFrom: mapView)
@@ -159,6 +162,7 @@ extension MapViewController: MKMapViewDelegate {
                     if complete {
                         self.removeSpinner()
                         self.removeProgressLabel()
+                        self.collectionView?.reloadData()
                     }
                 }
             }
@@ -235,16 +239,26 @@ extension MapViewController: CLLocationManagerDelegate {
 
 extension MapViewController: UICollectionViewDelegate, UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        //coming from number of items in array
-        return 4
+        return imageArray.count
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: REUSE_ID_PHOTOCELL, for: indexPath) as? PhotoViewCell
-        return cell!
+        guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: REUSE_ID_PHOTOCELL, for: indexPath) as? PhotoViewCell else { return UICollectionViewCell() }
+        let imageView = UIImageView(image: imageArray[indexPath.row])
+        cell.addSubview(imageView)
+        return cell
     }
     
     func numberOfSections(in collectionView: UICollectionView) -> Int {
         return 1
     }
+    
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        guard let popVc = storyboard?.instantiateViewController(identifier: STORYBOARD_ID_POPVC) as? PopViewController else { return }
+        if indexPath.row - 1 > imageArray.count { return } //something has gone wrong
+        let image = imageArray[indexPath.row]
+        popVc.loadImage(image: image)
+        present(popVc, animated: true, completion: nil)
+    }
 }
+
