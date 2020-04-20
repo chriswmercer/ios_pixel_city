@@ -9,6 +9,8 @@
 import UIKit
 import MapKit
 import CoreLocation
+import Alamofire
+import AlamofireImage
 
 class MapViewController: UIViewController, UIGestureRecognizerDelegate {
 
@@ -26,6 +28,9 @@ class MapViewController: UIViewController, UIGestureRecognizerDelegate {
     
     var collectionView: UICollectionView?
     var flowLayout = UICollectionViewFlowLayout()
+    
+    var imageUrlArray = [String]()
+    var imageArray = [UIImage]()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -74,6 +79,7 @@ class MapViewController: UIViewController, UIGestureRecognizerDelegate {
     }
     
     @objc func animateViewDown() {
+        cancelAllSessions()
         pullupHeight.constant = 0
         UIView.animate(withDuration: 0.3) {
             self.view.layoutIfNeeded()
@@ -99,7 +105,7 @@ class MapViewController: UIViewController, UIGestureRecognizerDelegate {
         progressLabel = UILabel()
         let progressLabelWidth = Int(screensize.width - 40)
         progressLabel?.frame = CGRect(x: Int((screensize.width / 2)) - (progressLabelWidth / 2), y: (Int(pullupHeight.constant) / 2) + 25, width: progressLabelWidth, height: 40)
-        progressLabel?.font = UIFont(name: FONT_AVENIR_NEXT, size: 18)
+        progressLabel?.font = UIFont(name: FONT_AVENIR_NEXT, size: 14)
         progressLabel?.textColor = #colorLiteral(red: 0.2549019754, green: 0.2745098174, blue: 0.3019607961, alpha: 1)
         progressLabel?.textAlignment = .center
         progressLabel?.text = "Please wait..."
@@ -145,8 +151,18 @@ extension MapViewController: MKMapViewDelegate {
         let touchCoord = mapView.convert(touchPoint, toCoordinateFrom: mapView)
         
         let annotation = DroppablePin(identifier: REUSE_ID_PIN, coords: touchCoord)
-        let builder = FlickrApiURLBuilder(apiKey: FLICKR_KEY, withAnnotation: annotation, andNumberOfPhotos: 40)
-        print(builder.url)
+        
+        cancelAllSessions()
+        retrieveUrls(forAnnotation: annotation) { (finished) in
+            if finished {
+                self.retrieveImages { (complete) in
+                    if complete {
+                        self.removeSpinner()
+                        self.removeProgressLabel()
+                    }
+                }
+            }
+        }
         
         mapView.addAnnotation(annotation)
         let region = MKCoordinateRegion(center: touchCoord, latitudinalMeters: regionRadius * 2.0, longitudinalMeters: regionRadius * 2.0)
@@ -156,6 +172,47 @@ extension MapViewController: MKMapViewDelegate {
     func removePins() {
         for pin in mapView.annotations {
             mapView.removeAnnotation(pin)
+        }
+    }
+    
+    func retrieveUrls(forAnnotation annotation: DroppablePin, completion: @escaping (_ status: Bool) -> ()) {
+        imageUrlArray = []
+        
+        Alamofire.request(FlickrApiURLBuilder(apiKey: FLICKR_KEY, withAnnotation: annotation, andNumberOfPhotos: 40).url).responseJSON { (response) in
+            guard let json = response.result.value as? Dictionary<String, AnyObject> else { return }
+            print(json)
+            guard let photosDict = json["photos"] as? Dictionary<String, AnyObject> else { return }
+            guard let photos = photosDict["photo"] as? [Dictionary<String, AnyObject>] else { return }
+            for photo in photos {
+                let farmValue = photo["farm"]!
+                let serverValue = photo["server"]!
+                let idValue = photo["id"]!
+                let secretValue = photo["secret"]!
+                let postUrl = "https://farm\(farmValue).staticflickr.com/\(serverValue)/\(idValue)_\(secretValue).jpg"
+                self.imageUrlArray.append(postUrl)
+            }
+            completion(true)
+        }
+    }
+    
+    func retrieveImages(completion: @escaping (_ status: Bool) -> ()) {
+        imageArray = []
+        for url in imageUrlArray {
+            Alamofire.request(url).responseImage { (response) in
+                guard let image = response.result.value else { return }
+                self.imageArray.append(image)
+                self.progressLabel?.text = "\(self.imageArray.count)/40 images downloaded..."
+                if self.imageArray.count == self.imageUrlArray.count {
+                    completion(true)
+                }
+            }
+        }
+    }
+    
+    func cancelAllSessions() {
+        Alamofire.SessionManager.default.session.getTasksWithCompletionHandler { (sessionDataTask, uploadData, downloadData) in
+            sessionDataTask.forEach({ $0.cancel() }) //kinda link
+            downloadData.forEach({ $0.cancel() })
         }
     }
 }
